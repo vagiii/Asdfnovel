@@ -8,16 +8,34 @@ import javax.inject.Singleton
 class Repository @Inject constructor(
     private val db: AppDatabase
 ) {
-    private val dao = db.projectDao()
+    private val projectDao = db.projectDao()
+    private val documentDao = db.documentDao()
 
-    fun observeProjects(): Flow<List<Project>> = dao.observeAll()
+    /* Projects */
+    fun observeProjects(): Flow<List<Project>> = projectDao.observeAll()
 
     suspend fun addProject(title: String) {
         val p = Project(title = title)
-        dao.insert(p)
+        projectDao.insert(p)
     }
 
     suspend fun deleteProject(project: Project) {
-        dao.delete(project)
+        projectDao.delete(project)
+    }
+
+    /* Documents */
+    fun observeDocumentsForProject(projectId: String): Flow<List<Document>> =
+        documentDao.observeForProject(projectId)
+
+    suspend fun addDocument(document: Document): Long {
+        return documentDao.insert(document)
+    }
+
+    suspend fun updateDocument(document: Document) {
+        documentDao.update(document)
+    }
+
+    suspend fun deleteDocument(document: Document) {
+        documentDao.delete(document)
     }
 }
